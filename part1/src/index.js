@@ -40,8 +40,10 @@ const Hello = ({ name, age }) => {
 
 const App = () => {
   const [counter, setCounter] = useState(100);
-  setTimeout(() => setCounter(counter + 1), 1000);
-  console.log('rendering...', counter)
+
+  const increaseByOne = () => setCounter(counter + 1);
+  const setToZero = () => setCounter(0);
+
   const course = {
     name: "Half Stack application development",
     parts: [
@@ -52,6 +54,8 @@ const App = () => {
   };
   return (
     <div>
+      <button onClick={increaseByOne}>plus</button>
+      <button onClick={setToZero}>zero</button>
       <div>{counter}</div>
       <Hello name={"Aemon"} age={25}></Hello>
       <Header course={course.name} />
