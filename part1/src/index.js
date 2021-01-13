@@ -1,66 +1,27 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
-const Header = (props) => <h1>{props.course}</h1>;
-
-const Part = (props) => (
-  <p>
-    {props.part} {props.exercises}
-  </p>
-);
-
-const Content = (props) => {
-  return (
-    <div>
-      {props.parts.map((a, index) => (
-        <Part key={index} part={a.name} exercises={a.exercises}></Part>
-      ))}
-    </div>
-  );
+const Display = ({ counter }) => {
+  return <div>{counter}</div>;
 };
 
-const Total = (props) => (
-  <p>
-    Number of exercises{" "}
-    {props.parts.map((a) => a.exercises).reduce((a, b) => a + b)}
-  </p>
-);
-
-const Hello = ({ name, age }) => {
-  const bornYear = () => new Date().getFullYear() - age;
-  return (
-    <div>
-      <p>
-        Hello {name}, you are {age} years old
-      </p>
-      <p>So you were probably born in {bornYear()}</p>
-    </div>
-  );
+const Button = ({ handleClick, text }) => {
+  return <button onClick={handleClick}>{text}</button>;
 };
 
 const App = () => {
-  const [counter, setCounter] = useState(100);
+  const [counter, setCounter] = useState(0);
 
   const increaseByOne = () => setCounter(counter + 1);
+  const decreaseByOne = () => setCounter(counter - 1);
   const setToZero = () => setCounter(0);
 
-  const course = {
-    name: "Half Stack application development",
-    parts: [
-      { name: "Fundamentals of React", exercises: 10 },
-      { name: "Using props to pass data", exercises: 7 },
-      { name: "State of a component", exercises: 14 },
-    ],
-  };
   return (
     <div>
-      <button onClick={increaseByOne}>plus</button>
-      <button onClick={setToZero}>zero</button>
-      <div>{counter}</div>
-      <Hello name={"Aemon"} age={25}></Hello>
-      <Header course={course.name} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts}></Total>
+      <Display counter={counter}></Display>
+      <Button handleClick={increaseByOne} text="plus"></Button>
+      <Button handleClick={setToZero} text="zero"></Button>
+      <Button handleClick={decreaseByOne} text="minus"></Button>
     </div>
   );
 };
