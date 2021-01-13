@@ -1,72 +1,52 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
-const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>;
-
-const Display = ({ text, value }) => (
-  <tr>
-    <td>{text}</td>
-    <td>{value}</td>
-  </tr>
-);
-
-const Statistics = ({ goodValue, neutralValue, badValue }) => {
-  const all = () => goodValue + neutralValue + badValue;
-
-  if (all() === 0) {
-    return <h4>No feedback given</h4>;
-  }
-
-  const average = () => (goodValue - badValue) / all();
-
-  const positive = () => goodValue / all();
-
-  return (
-    <table>
-      <tbody>
-        <Display text="good" value={goodValue}></Display>
-        <Display text="neutral" value={neutralValue}></Display>
-        <Display text="bad" value={badValue}></Display>
-        <Display text="all" value={all()}></Display>
-        <Display text="average" value={average()}></Display>
-        <Display text="positive" value={positive() + "%"}></Display>
-      </tbody>
-    </table>
+const App = (props) => {
+  const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState(
+    Array.apply(null, { length: props.anecdotes.length }).map(function () {
+      return 0;
+    })
   );
-};
 
-const App = () => {
-  // save clicks of each button to own state
-  const [good, setGood] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [bad, setBad] = useState(0);
-
-  const handleGoodButtonClick = () => {
-    setGood(good + 1);
+  const getRandomInt = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //不含最大值，含最小值
   };
 
-  const handleNeutralButtonClick = () => {
-    setNeutral(neutral + 1);
+  const handleNextAnecdoteButtonClick = (max) => () => {
+    setSelected(getRandomInt(0, max));
   };
 
-  const handleBadButtonClick = () => {
-    setBad(bad + 1);
+  const handleVoteButtonClick = () => {
+    let copy = [...points];
+    copy[selected] += 1;
+    setPoints(copy);
   };
 
   return (
     <div>
-      <h1>give feedback</h1>
-      <Button text="good" onClick={handleGoodButtonClick}></Button>
-      <Button text="neutral" onClick={handleNeutralButtonClick}></Button>
-      <Button text="bad" onClick={handleBadButtonClick}></Button>
-      <h1>statistics</h1>
-      <Statistics
-        goodValue={good}
-        neutralValue={neutral}
-        badValue={bad}
-      ></Statistics>
+      <h1>Anecdote of the day</h1>
+      <p>{props.anecdotes[selected]}</p>
+      <p>has {points[selected]} votes</p>
+      <button onClick={handleVoteButtonClick}>vote</button>
+      <button onClick={handleNextAnecdoteButtonClick(props.anecdotes.length)}>
+        next anecdote
+      </button>
+      <h1>Anecdote with most votes</h1>
+      <p>{props.anecdotes[points.indexOf(Math.max(...points))]}</p>
     </div>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const anecdotes = [
+  "If it hurts, do it more often",
+  "Adding manpower to a late software project makes it later!",
+  "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
+  "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+  "Premature optimization is the root of all evil.",
+  "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
+];
+
+ReactDOM.render(<App anecdotes={anecdotes} />, document.getElementById("root"));
