@@ -26,6 +26,18 @@ const Total = (props) => (
   </p>
 );
 
+const Hello = ({ name, age }) => {
+  const bornYear = () => new Date().getFullYear() - age;
+  return (
+    <div>
+      <p>
+        Hello {name}, you are {age} years old
+      </p>
+      <p>So you were probably born in {bornYear()}</p>
+    </div>
+  );
+};
+
 const App = () => {
   const course = {
     name: "Half Stack application development",
@@ -37,6 +49,7 @@ const App = () => {
   };
   return (
     <div>
+      <Hello name={"Aemon"} age={25}></Hello>
       <Header course={course.name} />
       <Content parts={course.parts} />
       <Total parts={course.parts}></Total>
