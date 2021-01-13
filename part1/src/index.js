@@ -1,37 +1,70 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
-const History = ({ allClicks }) => {
-  if (allClicks.length === 0) {
-    return <div>the app is used by pressing the buttons</div>;
+const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>;
+
+const Display = ({ text, value }) => (
+  <tr>
+    <td>{text}</td>
+    <td>{value}</td>
+  </tr>
+);
+
+const Statistics = ({ goodValue, neutralValue, badValue }) => {
+  const all = () => goodValue + neutralValue + badValue;
+
+  if (all() === 0) {
+    return <h4>No feedback given</h4>;
   }
-  return <div> button press history: {allClicks.join(" ")}</div>;
+
+  const average = () => (goodValue - badValue) / all();
+
+  const positive = () => goodValue / all();
+
+  return (
+    <table>
+      <tbody>
+        <Display text="good" value={goodValue}></Display>
+        <Display text="neutral" value={neutralValue}></Display>
+        <Display text="bad" value={badValue}></Display>
+        <Display text="all" value={all()}></Display>
+        <Display text="average" value={average()}></Display>
+        <Display text="positive" value={positive() + "%"}></Display>
+      </tbody>
+    </table>
+  );
 };
 
-const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
-
 const App = () => {
-  const [left, setLeft] = useState(0);
-  const [right, setRight] = useState(0);
-  const [allClicks, setAll] = useState([]);
+  // save clicks of each button to own state
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  const handleLeftClick = () => {
-    setAll(allClicks.concat("L"));
-    setLeft(left + 1);
+  const handleGoodButtonClick = () => {
+    setGood(good + 1);
   };
 
-  const handleRightClick = () => {
-    setAll(allClicks.concat("R"));
-    setRight(right + 1);
+  const handleNeutralButtonClick = () => {
+    setNeutral(neutral + 1);
+  };
+
+  const handleBadButtonClick = () => {
+    setBad(bad + 1);
   };
 
   return (
     <div>
-      {left}
-      <Button onClick={handleLeftClick} text="left"></Button>
-      <Button onClick={handleRightClick} text="right"></Button>
-      {right}
-      <History allClicks={allClicks}></History>
+      <h1>give feedback</h1>
+      <Button text="good" onClick={handleGoodButtonClick}></Button>
+      <Button text="neutral" onClick={handleNeutralButtonClick}></Button>
+      <Button text="bad" onClick={handleBadButtonClick}></Button>
+      <h1>statistics</h1>
+      <Statistics
+        goodValue={good}
+        neutralValue={neutral}
+        badValue={bad}
+      ></Statistics>
     </div>
   );
 };
