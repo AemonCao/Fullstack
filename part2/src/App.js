@@ -1,84 +1,83 @@
 import React, { useState, useEffect } from "react";
-import phonebookService from "./services/phonebook";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
+import Note from "./components/Note";
+import Notification from "./components/Notification";
+import noteService from "./services/notes";
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setnewNumber] = useState("");
-  const [filterWord, setFilterWord] = useState("");
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState("");
+  const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  useEffect(() => {
-    phonebookService.getAll().then((response) => {
-      setPersons(response);
+  const hook = () => {
+    noteService.getAll().then((initialNotes) => {
+      setNotes(initialNotes);
     });
-  }, []);
-
-  const filterPersons = persons.filter(
-    (person) =>
-      person.name.toUpperCase().indexOf(filterWord.toUpperCase()) !== -1
-  );
-
-  const addPerson = (event) => {
-    event.preventDefault();
-    const person = persons.find((p) => p.name === newName);
-    if (person) {
-      if (
-        window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
-        )
-      ) {
-        phonebookService
-          .update(person.id, { ...person, number: newNumber })
-          .then((response) => {
-            setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
-          });
-      }
-    } else {
-      phonebookService
-        .create({ name: newName, number: newNumber })
-        .then((response) => {
-          setPersons(persons.concat(response));
-        });
-    }
   };
 
-  const handleFilterWordChange = (event) => {
-    setFilterWord(event.target.value);
-  };
+  useEffect(hook, []);
 
-  const handleNewNameChange = (event) => {
-    setNewName(event.target.value);
-  };
-
-  const handleNewNumberChange = (event) => {
-    setnewNumber(event.target.value);
-  };
-
-  const handleRemoveButtonClick = (person) => {
-    if (window.confirm(`remove ${person.name}?`))
-      phonebookService.remove(person.id).then((response) => {
-        setPersons(persons.filter((p) => p.id !== person.id));
+  const toggleImportance = (id) => {
+    const note = notes.find((n) => n.id === id);
+    const changedNote = { ...note, important: !note.important };
+    noteService
+      .update(id, changedNote)
+      .then((returnedNote) => {
+        setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)));
+      })
+      .catch((error) => {
+        setErrorMessage(
+          `the note ${note.content} was already deleted from server`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+        setNotes(notes.filter((n) => n.id !== id));
       });
   };
 
+  const addNote = (event) => {
+    event.preventDefault();
+    const noteObject = {
+      content: newNote,
+      date: new Date().toISOString(),
+      important: Math.random() < 0.5,
+      id: notes.length + 1,
+    };
+    noteService.create(noteObject).then((returnedNote) => {
+      setNotes(notes.concat(returnedNote));
+      setNewNote("");
+    });
+  };
+
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value);
+  };
+
+  const notesToShow = showAll ? notes : notes.filter((note) => note.important);
+
   return (
     <div>
-      <h2>Phonebook</h2>
-      <Filter onFilterInputChange={handleFilterWordChange.bind(this)} />
-      <h2>add a new</h2>
-      <PersonForm
-        onFormSubmit={addPerson.bind(this)}
-        onNameInputChange={handleNewNameChange.bind(this)}
-        onNumberInputChange={handleNewNumberChange.bind(this)}
-      />
-      <h2>Numbers</h2>
-      <Persons
-        persons={filterPersons}
-        onRemoveButtonClick={handleRemoveButtonClick}
-      />
+      <h1>Notes</h1>
+      <Notification message={errorMessage} />
+      <div>
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? "important" : "all"}
+        </button>
+      </div>
+      <ul>
+        {notesToShow.map((note) => (
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportance(note.id)}
+          />
+        ))}
+      </ul>
+      <form onSubmit={addNote}>
+        <input value={newNote} onChange={handleNoteChange} />
+        <button type="submit">save</button>
+      </form>
     </div>
   );
 };
