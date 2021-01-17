@@ -1,75 +1,59 @@
 import React, { useState, useEffect } from "react";
-import Note from "./components/Note";
-import noteService from "./services/notes";
+import axios from "axios";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const App = () => {
-  const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState("");
-  const [showAll, setShowAll] = useState(true);
+  const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setnewNumber] = useState("");
+  const [filterWord, setFilterWord] = useState("");
 
-  const hook = () => {
-    noteService.getAll().then((initialNotes) => {
-      setNotes(initialNotes);
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      setPersons(response.data);
     });
-  };
+  }, []);
 
-  useEffect(hook, []);
+  const filterPersons = persons.filter(
+    (person) =>
+      person.name.toUpperCase().indexOf(filterWord.toUpperCase()) !== -1
+  );
 
-  const toggleImportance = (id) => {
-    const note = notes.find((n) => n.id === id);
-    const changedNote = { ...note, important: !note.important };
-    noteService
-      .update(id, changedNote)
-      .then((returnedNote) => {
-        setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)));
-      })
-      .catch((error) => {
-        alert(`the note ${note.content} was already deleted from server`);
-        setNotes(notes.filter((n) => n.id !== id));
-      });
-  };
-
-  const addNote = (event) => {
+  const addPerson = (event) => {
     event.preventDefault();
-    const noteObject = {
-      content: newNote,
-      date: new Date().toISOString(),
-      important: Math.random() < 0.5,
-      id: notes.length + 1,
-    };
-    noteService.create(noteObject).then((returnedNote) => {
-      setNotes(notes.concat(returnedNote));
-      setNewNote("");
-    });
+    if (persons.map((person) => person.name).includes(newName)) {
+      alert(`${newName} is already added to phonebook`);
+    } else {
+      setPersons(persons.concat({ name: newName, number: newNumber }));
+    }
   };
 
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value);
+  const handleFilterWordChange = (event) => {
+    setFilterWord(event.target.value);
   };
 
-  const notesToShow = showAll ? notes : notes.filter((note) => note.important);
+  const handleNewNameChange = (event) => {
+    setNewName(event.target.value);
+  };
+
+  const handleNewNumberChange = (event) => {
+    setnewNumber(event.target.value);
+  };
 
   return (
     <div>
-      <h1>Notes</h1>
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? "important" : "all"}
-        </button>
-      </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note
-            key={note.id}
-            note={note}
-            toggleImportance={() => toggleImportance(note.id)}
-          />
-        ))}
-      </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
-        <button type="submit">save</button>
-      </form>
+      <h2>Phonebook</h2>
+      <Filter onFilterInputChange={handleFilterWordChange.bind(this)} />
+      <h2>add a new</h2>
+      <PersonForm
+        onFormSubmit={addPerson.bind(this)}
+        onNameInputChange={handleNewNameChange.bind(this)}
+        onNumberInputChange={handleNewNumberChange.bind(this)}
+      />
+      <h2>Numbers</h2>
+      <Persons persons={filterPersons} />
     </div>
   );
 };
