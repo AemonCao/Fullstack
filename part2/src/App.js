@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import phonebookService from "./services/phonebook";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
@@ -11,8 +11,8 @@ const App = () => {
   const [filterWord, setFilterWord] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    phonebookService.getAll().then((response) => {
+      setPersons(response);
     });
   }, []);
 
@@ -23,16 +23,24 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    if (persons.map((person) => person.name).includes(newName)) {
-      alert(`${newName} is already added to phonebook`);
+    const person = persons.find((p) => p.name === newName);
+    if (person) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        phonebookService
+          .update(person.id, { ...person, number: newNumber })
+          .then((response) => {
+            setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
+          });
+      }
     } else {
-      axios
-        .post("http://localhost:3001/persons", {
-          name: newName,
-          number: newNumber,
-        })
+      phonebookService
+        .create({ name: newName, number: newNumber })
         .then((response) => {
-          setPersons(persons.concat(response.data));
+          setPersons(persons.concat(response));
         });
     }
   };
@@ -49,6 +57,13 @@ const App = () => {
     setnewNumber(event.target.value);
   };
 
+  const handleRemoveButtonClick = (person) => {
+    if (window.confirm(`remove ${person.name}?`))
+      phonebookService.remove(person.id).then((response) => {
+        setPersons(persons.filter((p) => p.id !== person.id));
+      });
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -60,7 +75,10 @@ const App = () => {
         onNumberInputChange={handleNewNumberChange.bind(this)}
       />
       <h2>Numbers</h2>
-      <Persons persons={filterPersons} />
+      <Persons
+        persons={filterPersons}
+        onRemoveButtonClick={handleRemoveButtonClick}
+      />
     </div>
   );
 };
