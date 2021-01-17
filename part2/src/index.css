@@ -25,6 +25,14 @@ h1 {
 
 .error {
   color: red;
+}
+
+.success {
+  color: green;
+}
+
+.error,
+.success {
   background: lightgrey;
   font-size: 20px;
   border-style: solid;
