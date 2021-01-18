@@ -31,7 +31,7 @@ const generateId = () => {
 };
 
 app.get("/", (request, response) => {
-  res.send("<h1>Hello World!</h1>");
+  response.send("<h1>Hello World!</h1>");
 });
 
 app.get("/api/notes", (request, response) => {
@@ -71,7 +71,7 @@ app.post("/api/notes", (request, response) => {
   };
 
   notes = notes.concat(note);
-  
+
   response.json(note);
 });
 
