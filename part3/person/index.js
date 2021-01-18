@@ -1,4 +1,4 @@
-const { request } = require("express");
+// const { request, response } = require("express");
 const express = require("express");
 const app = express();
 
@@ -27,6 +27,10 @@ let persons = [
   },
 ];
 
+const generateId = () => {
+  return Math.ceil(Math.random() * 100000000);
+};
+
 app.get("/info", (request, response) => {
   response.send(
     `<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`
@@ -51,6 +55,34 @@ app.delete("/api/persons/:id", (requset, response) => {
   const id = Number(requset.params.id);
   persons = persons.filter((person) => person.id !== id);
   response.status(204).end();
+});
+
+app.post("/api/persons", (requset, response) => {
+  const body = requset.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "name missing",
+    });
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: "number missing",
+    });
+  } else if (persons.find((person) => person.name === body.name)) {
+    return response.status(409).json({
+      error: `${body.name} is already added to phonebook`,
+    });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
 });
 
 const PORT = 3001;
