@@ -1,2 +1,5 @@
 ### get_all
-GET http://localhost:3001/api/persons
+GET http://localhost:3001/api/persons HTTP/1.1
+
+### get_by_id
+GET http://localhost:3001/api/persons/4 HTTP/1.1
