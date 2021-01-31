@@ -90,6 +90,20 @@ app.post("/api/persons", (requset, response) => {
   });
 });
 
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body;
+  const person = {
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
+    })
+    .catch((error) => next(error));
+});
+
+// 未知端点处理中间件
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
