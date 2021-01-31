@@ -37,6 +37,12 @@ const App = () => {
           .update(person.id, { ...person, number: newNumber })
           .then((response) => {
             setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
+          })
+          .catch((error) => {
+            setErrorMessage(error.response.data.error);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
           });
       }
     } else {
@@ -47,6 +53,12 @@ const App = () => {
           setSuccessMessage(`Added ${response.name}`);
           setTimeout(() => {
             setSuccessMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setErrorMessage(error.response.data.error);
+          setTimeout(() => {
+            setErrorMessage(null);
           }, 5000);
         });
     }
