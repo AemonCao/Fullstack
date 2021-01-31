@@ -12,3 +12,6 @@ Content-Type: application/json
 
 ### get_all
 GET http://localhost:3001/api/notes
+
+### get_by_id
+GET http://localhost:3001/api/notes/60169b76b76fe246d4c9217a
