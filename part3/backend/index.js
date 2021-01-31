@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const Note = require("./models/note");
-const { request, response } = require("express");
 const app = express();
 
 // 跨域
