@@ -7,6 +7,9 @@ morgan.token("json", function (req, res) {
   return JSON.stringify(req.body);
 });
 
+// 每当 express 收到一个 HTTP GET 请求时，它都会首先检查build 目录是否包含与请求地址对应的文件。
+app.use(express.static("build"));
+// 跨域
 app.use(cors());
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :json")
