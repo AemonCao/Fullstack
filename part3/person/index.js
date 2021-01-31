@@ -41,10 +41,6 @@ let persons = [
   },
 ];
 
-const generateId = () => {
-  return Math.ceil(Math.random() * 100000000);
-};
-
 app.get("/info", (request, response) => {
   response.send(
     `<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`
@@ -80,21 +76,16 @@ app.post("/api/persons", (requset, response) => {
     return response.status(400).json({
       error: "number missing",
     });
-  } else if (persons.find((person) => person.name === body.name)) {
-    return response.status(409).json({
-      error: `${body.name} is already added to phonebook`,
-    });
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
