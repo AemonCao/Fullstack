@@ -1,40 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
-const mongoose = require("mongoose");
+const Note = require("./models/note");
 const app = express();
 
 app.use(morgan("tiny"));
 app.use(express.json());
-
-const password = process.argv[2];
-const dbname = "note-app";
-
-const url = `mongodb+srv://aemon:${password}@cluster0.2issf.mongodb.net/${dbname}?retryWrites=true&w=majority`;
-
-mongoose.connect(url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-});
-
-const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
-});
-
-noteSchema.set("toJSON", {
-  transform: (documnet, returnedObject) => {
-    // 将 mongoose 自带的 _id 属性格式化为字符串
-    returnedObject.id = returnedObject._id.toString();
-    // 删除原先的 _id 属性和 __v 属性
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-const Note = mongoose.model("Note", noteSchema);
 
 const generateId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
@@ -94,7 +65,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
