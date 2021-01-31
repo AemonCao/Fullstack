@@ -3,7 +3,17 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const Note = require("./models/note");
+const { request } = require("express");
 const app = express();
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError" && error.kind === "ObjectId") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+  next(error);
+};
 
 // 跨域
 app.use(cors());
@@ -29,10 +39,7 @@ app.get("/api/notes/:id", (request, response) => {
         response.status(404).end();
       }
     })
-    .catch((error) => {
-      console.log(error);
-      response.status(400).send({ error: "malformatted id" });
-    });
+    .catch((error) => next(error));
 });
 
 app.delete("/api/notes/:id", (request, response) => {
@@ -66,6 +73,8 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+// 错误处理中间件
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
