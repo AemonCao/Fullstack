@@ -12,12 +12,9 @@ describe('dummy', () => {
 describe('total likes', () => {
   const listWithOneBlog = [
     {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
       likes: 5,
-      __v: 0
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra'
     }
   ]
 
@@ -34,33 +31,49 @@ describe('total likes', () => {
 
   const listWithThreeBlog = [
     {
-      likes: 500,
+      likes: 100,
       title: 'Hello World!',
       author: 'Aemon Cao',
-      url: 'aemon.top',
-      __v: 0,
-      id: '60202905fe70d82b70f95292'
     },
     {
-      likes: 500,
+      likes: 200,
       title: 'Hello World!',
       author: 'Aemon Cao',
-      url: 'aemon.top',
-      __v: 0,
-      id: '60202917fe70d82b70f95293'
     },
     {
-      likes: 500,
+      likes: 300,
       title: 'Hello World!',
       author: 'Aemon Cao',
-      url: 'aemon.top',
-      __v: 0,
-      id: '6020321c0f066e5a64705d42'
     }
   ]
 
-  test('when list has only three blog, equals the likes of that', () => {
+  test('when list has three blog, equals the likes of that', () => {
     const result = listHelper.totalLikes(listWithThreeBlog)
-    expect(result).toBe(1500)
+    expect(result).toBe(600)
+  })
+})
+
+describe('favorite blog', () => {
+  const listWithThreeBlog = [
+    {
+      likes: 100,
+      title: 'Hello World!',
+      author: 'Aemon Cao',
+    },
+    {
+      likes: 200,
+      title: 'Hello World!',
+      author: 'Aemon Cao',
+    },
+    {
+      likes: 300,
+      title: 'Hello World!',
+      author: 'Aemon Cao',
+    }
+  ]
+
+  test('when list has three blog, equals the favorite blog ', () => {
+    const result = listHelper.favoriteBlog(listWithThreeBlog)
+    expect(result).toEqual({ likes: 300, title: 'Hello World!', author: 'Aemon Cao', })
   })
 })
