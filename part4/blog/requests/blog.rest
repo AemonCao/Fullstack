@@ -1,0 +1,13 @@
+### get_all
+GET http://localhost:3004/api/blogs HTTP/1.1
+
+### add
+POST http://localhost:3004/api/blogs HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "Hello World!",
+    "author": "Aemon Cao",
+    "url": "aemon.top",
+    "likes": 500
+}
