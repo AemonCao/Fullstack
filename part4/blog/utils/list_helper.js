@@ -21,6 +21,18 @@ const mostBlogs = blogs => {
   return _.maxBy(temp, 'blogs')
 }
 
+const mostLikes = blogs => {
+  var temp = []
+  _.forIn(_.groupBy(blogs, item => item.author), (value, key) => {
+    temp.push({ author: key, likes: value.map(a => a.likes).reduce((a, b) => a + b, 0) })
+  })
+  return _.maxBy(temp, 'likes')
+}
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs
+  dummy,
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+  mostLikes
 }

@@ -99,10 +99,19 @@ describe('favorite blog', () => {
 describe('most blog', () => {
   test('when list has six blog, equals the most blog', () => {
     const result = listHelper.mostBlogs(blogs)
-    console.log(result)
     expect(result).toEqual({
       author: 'Robert C. Martin',
       blogs: 3
+    })
+  })
+})
+
+describe('most likes', () => {
+  test('when list has six blog, equals the most likes', () => {
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17
     })
   })
 })
